@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		518E465C160826BB0011B899 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 518E465B160826BB0011B899 /* main.c */; };
 		518E465E160826BB0011B899 /* pdp_11.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 518E465D160826BB0011B899 /* pdp_11.1 */; };
+		518E4666160826DD0011B899 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 518E4664160826DD0011B899 /* core.c */; };
+		518E4669160826F90011B899 /* dispatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 518E4667160826F90011B899 /* dispatch.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +30,10 @@
 		518E4657160826BB0011B899 /* pdp-11 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pdp-11"; sourceTree = BUILT_PRODUCTS_DIR; };
 		518E465B160826BB0011B899 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		518E465D160826BB0011B899 /* pdp_11.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = pdp_11.1; sourceTree = "<group>"; };
+		518E4664160826DD0011B899 /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core.c; sourceTree = "<group>"; };
+		518E4665160826DD0011B899 /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
+		518E4667160826F90011B899 /* dispatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dispatch.c; sourceTree = "<group>"; };
+		518E4668160826F90011B899 /* dispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dispatch.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +66,10 @@
 		518E465A160826BB0011B899 /* pdp-11 */ = {
 			isa = PBXGroup;
 			children = (
+				518E4667160826F90011B899 /* dispatch.c */,
+				518E4668160826F90011B899 /* dispatch.h */,
+				518E4664160826DD0011B899 /* core.c */,
+				518E4665160826DD0011B899 /* core.h */,
 				518E465B160826BB0011B899 /* main.c */,
 				518E465D160826BB0011B899 /* pdp_11.1 */,
 			);
@@ -118,6 +128,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				518E465C160826BB0011B899 /* main.c in Sources */,
+				518E4666160826DD0011B899 /* core.c in Sources */,
+				518E4669160826F90011B899 /* dispatch.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
