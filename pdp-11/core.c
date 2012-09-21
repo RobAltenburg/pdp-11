@@ -18,8 +18,19 @@
 //}
 
 
+// access directly to core
+// these functions are broken out to allow for memory managment
+char core_read_byte(short offset)
+{
+    return core[offset];
+}
+void core_write_byte (char byte, short offset)
+{
+    core[offset] = byte;
+    
+}
 
-short get_word (short offset)
+short core_read_word(short offset)
 {
     // todo, raise an error if offset isn't aligned
     if (offset % 2 > 0 ) { printf("ERROR: attempt to read unaligned word.\n");}
@@ -27,8 +38,7 @@ short get_word (short offset)
     return  *(short *)(core + offset);
 }
 
-
-void write_word (short word, short offset)
+void core_write_word (short word, short offset)
 {
     *(short *)(core + offset) = word;
     
@@ -50,28 +60,28 @@ short get_address (char addr)
             printf("Error: request register as address.\n");
             break;
         case 2: // Rn contains the address of the operand, then increment Rn
-            address = pdp_register[register_number];
-            ++pdp_register[register_number];
+            address = reg[register_number];
+            ++reg[register_number];
             break;
         case 3: // Rn contains the address of the operand, then increment Rn by 2
-            address = *(short *)(core + pdp_register[register_number]);
-            pdp_register[register_number] = pdp_register[register_number] + 2;
+            address = *(short *)(core + reg[register_number]);
+            reg[register_number] = reg[register_number] + 2;
             break;
         case 4: // Decrement Rn, then Rn contains the address of the operand
-            --pdp_register[register_number];
-            address = pdp_register[register_number];
+            --reg[register_number];
+            address = reg[register_number];
             break;
         case 5: // Decrement Rn by 2, then Rn contains the address of the operand
-            pdp_register[register_number] = pdp_register[register_number] - 2;
-            address = *(short *)(core + pdp_register[register_number]);
+            reg[register_number] = reg[register_number] - 2;
+            address = *(short *)(core + reg[register_number]);
             break;
         case 6: // Rn+X is the address of the operand  (Assumes PC was +2 incremented once already)
-            address = pdp_register[register_number] + get_word(pdp_register[7]);
-            pdp_register[register_number] = pdp_register[register_number] + 2;
+            address = reg[register_number] + core_read_word(reg[7]);
+            reg[register_number] = reg[register_number] + 2;
             break;
         case 7: // Rn+X is the address of the address (Assumes PC was +2 incremented once already)
-            address = *(short *)(core + pdp_register[register_number] + get_word(pdp_register[7]));
-            pdp_register[register_number] = pdp_register[register_number] + 2;
+            address = *(short *)(core + reg[register_number] + core_read_word(reg[7]));
+            reg[register_number] = reg[register_number] + 2;
             break;
         default:
             printf("ERROR: (get_address) Bad Address Mode %o\n", address_mode);
@@ -83,33 +93,72 @@ short get_address (char addr)
     return address;
 }
 
-short get_operand (char addr)
+short read_word (char addr)
 {
      
-    short operand;
+    short word;
     switch ((addr & 070) >> 3) { // switch on address mode
         case 0: // immediate value
-            operand = pdp_register[addr & 07];
+            word = reg[addr & 07];
             break;
         default: // memory reference
-            operand = *(short *)(core + get_address(addr));
+            word = core_read_word(get_address(addr));
             break;
     }
-    return operand;
+    return word;
 }
 
-void set_word (char dest_addr, short source_value)
+char read_byte (char addr)
+{
+    
+    char byte;
+    switch ((addr & 070) >> 3) { // switch on address mode
+        case 0: // immediate value
+            byte = (char) reg[addr & 07];  //todo: make sure this reads the correct byte
+            break;
+        default: // memory reference
+            byte = core_read_byte(get_address(addr));
+            break;
+    }
+    return byte;
+}
+   
+void write_word (char dest_addr, short source_value)
 {
     
     switch ((dest_addr & 070) >> 3) { // switch on address mode
         case 0: // immediate value
-            pdp_register[dest_addr & 07] = source_value;
+            reg[dest_addr & 07] = source_value;
             break;
         default: // memory reference
-           *(short *)(core + get_address(dest_addr)) = source_value;
+            core_write_word (source_value, get_address(dest_addr));
             break;
     }
     
+}
+
+void write_byte(char dest_addr, char source_value)
+{
+    
+    switch ((dest_addr & 070) >> 3) { // switch on address mode
+        case 0: // immediate value
+            reg[dest_addr & 07] = (short) source_value;  //todo: make sure this sign-extends correctly
+            break;
+        default: // memory reference
+            core_write_byte (source_value, get_address(dest_addr));
+            break;
+    }
+    
+}
+
+
+void psw_set (short values)
+{
+    processor_status_word = processor_status_word | values;
+}
+void psw_reset (short values)
+{
+    processor_status_word = processor_status_word & ( 0177777 - values);
 }
 
 void dump_core (short orig, short range)

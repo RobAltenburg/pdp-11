@@ -13,65 +13,53 @@
 
 short dispatch (short opcode) {
     
-    //short source_w, dest_w;
-    //char source_b, dest_b;
-    /*
-     switch (opcode) {
-     case 000000: // HALT
-     // Halt CPU until restarted; abort i/o
-     printf("Halt\n");
-     return;
-     break;
-     case 000001: // WAIT (TODO: Right now, this is the same as HALT)
-     // Halt CPU until restarted or interrupted
-     printf("Wait\n");
-     return;
-     break;
-     case 000005: // RESET
-     // Reset all i/o devices
-     break;
-     case 000240: // NOP
-     // No operation
-     printf("NOP\n");
-     break;
-     default:
-     break;
-     }
-     */
+    short temp_w;
     
     // Zero Operand Instructions
     
-    if (opcode == 0) { //HALT
+    if (opcode == HALT) {
         // Halt CPU until restarted; abort i/o
         printf("Halt\n");
         return 1;
     }
-    else if (opcode == 0240) { // NOP
+    else if (opcode == NOP) {
         // No operation
-        //printf("NOP\n");
+        printf("NOP\n");
     }
     
-    // One Operand Instructions
-    
-    else if ((opcode >> 6) == 050 ) { // CLR
+   
+    else if ((opcode & ONE_OP) == CLR ) {
      
-        set_word(opcode & 077, 0);
+        write_word(opcode & 077, 0);
+        psw_reset(PSW_N + PSW_C + PSW_V);
+        psw_set(PSW_Z);
+         
+
+    }
+    
+    else if ((opcode & ONE_OP) == CLRB ) {
+        
+        write_byte (opcode & 077, 0);
         
     }
+    
     
     // Two Operand Instructions.
     
-    else if ((opcode >> 12) == 01) { // MOV
+    else if ((opcode & TWO_OP) == MOV) { // MOV
         
-        set_word(opcode & 077,get_operand((opcode & 07700) >> 6));
+        temp_w = read_word((opcode & 07700) >> 6);
+        write_word(opcode & 077, temp_w);
+ 
+
         
     }
     
     // Other Transfer of Control Instructions
     
-    else if ((opcode >> 6) == 01) { // JMP
-        pdp_register[7] = get_address(opcode);
-        //printf ("JMP %o\n", pdp_register[7]);
+    else if ((opcode & ONE_OP) == JMP) { // JMP
+        reg[7] = get_address(opcode);
+        //printf ("JMP %o\n", reg[7]);
     }
     
     else {
