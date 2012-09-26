@@ -46,20 +46,22 @@ int main(int argc, const char * argv[])
     //printf("local char = %d bytes.\n", (int) sizeof(char));
     //printf("local short = %d bytes.\n\n", (int) sizeof(short));
     
-    reg[7] = 01000;  // Start exeicution at .ORG 1000
+    reg[7] = 01000;  // Start execution at .ORG 1000
     
     
     //load a program into memory
     
-    //JMP nxt; 0240, MOV nxt R1, NOP, HALT
-    short program[] = {0167, 4, 077, 016700, -4, 010002, 015002, 000};
+    short program[] = {JMP + 067, 4, 0177, MOV + 06700, -4, MOV + 02, INC + 02, HALT};
     for (int i = 0; i < sizeof(program)/2; i++) {
         core_write_word(program[i], reg[7] + (i * 2));
     }
     
     
+    printf("PSW: %o\n", processor_status_word);
     
     process_loop();
+    
+    printf("PSW: %o\n", processor_status_word);
     
     //dump_core(01000, 18);
     

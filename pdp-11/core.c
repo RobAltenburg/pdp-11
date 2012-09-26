@@ -161,6 +161,30 @@ void psw_reset (short values)
     processor_status_word = processor_status_word & ( 0177777 - values);
 }
 
+char psw_test (short values)
+{
+    if ((processor_status_word & values) == values) {
+        return 1;
+    } else {
+        return 0;
+    }
+    
+}
+
+// these next two functions set the program status word depending on the value
+void psw_on_word (short word)
+{
+    word == 0 ? psw_set(PSW_Z) : psw_reset(PSW_Z);
+    word < 0 ? psw_set(PSW_N) : psw_reset(PSW_N);
+}
+
+void psw_on_byte (short byte)
+{
+    byte == 0 ? psw_set(PSW_Z) : psw_reset(PSW_Z);
+    byte < 0 ? psw_set(PSW_N) : psw_reset(PSW_N);
+}
+
+
 void dump_core (short orig, short range)
 {
     printf("CORE DUMP:\n");

@@ -42,8 +42,12 @@ char read_byte (char addr);
 void write_word (char dest_addr, short source_value);
 void write_byte(char dest_addr, char source_value);
 
+
 void psw_set (short values);
 void psw_reset (short values);
+void psw_on_word (short word);
+void psw_on_byte (short byte);
+char psw_test (short values);
 
 short byte_swap (short word);
 void dump_core (short orig, short range);
