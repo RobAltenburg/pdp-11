@@ -154,16 +154,16 @@ void write_byte(char dest_addr, char source_value)
 
 void psw_set (short values)
 {
-    processor_status_word = processor_status_word | values;
+    PSW = PSW | values;
 }
 void psw_reset (short values)
 {
-    processor_status_word = processor_status_word & ( 0177777 - values);
+    PSW = PSW  & ( 0177777 - values);
 }
 
 char psw_test (short values)
 {
-    if ((processor_status_word & values) == values) {
+    if ((PSW & values) == values) {
         return 1;
     } else {
         return 0;

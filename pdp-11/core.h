@@ -11,7 +11,9 @@
 #ifndef pdp_11_core_h
 #define pdp_11_core_h
 
-char core[64 * 1024];
+char core[1 << 16];
+
+#define PSW     core[0177776]
 
 #define PSW_C   001
 #define PSW_V   002
@@ -24,9 +26,7 @@ char core[64 * 1024];
 //short * reg = (short *) (core + 0170000);
 
 short reg[8];
-
-short processor_status_word;
-
+ 
 char core_read_byte(short offset);
 short core_read_word(short offset);
 

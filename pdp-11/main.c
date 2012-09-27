@@ -24,10 +24,11 @@ void process_loop (void)
         for (int i = 0; i<7; i++) {
             printf("%o ",reg[i]);
         }
-        printf("\n");
+        printf("| %o \n",PSW);
         
         reg[7] = reg[7] + 2;
         
+        // if PSW T is set & opcode != RTT, trace trap from 14 (BPT)
         
         if (dispatch (opcode) == 1) return;  // process until halt
         
@@ -51,17 +52,17 @@ int main(int argc, const char * argv[])
     
     //load a program into memory
     
-    short program[] = {JMP + 067, 4, 0177, MOV + 06700, -4, MOV + 02, INC + 02, HALT};
+    short program[] = {JMP + 067, 4, 0176, MOV + 06700, -4, MOV + 02, INC + 02, HALT};
     for (int i = 0; i < sizeof(program)/2; i++) {
         core_write_word(program[i], reg[7] + (i * 2));
     }
     
     
-    printf("PSW: %o\n", processor_status_word);
-    
     process_loop();
     
-    printf("PSW: %o\n", processor_status_word);
+  
+    
+
     
     //dump_core(01000, 18);
     
