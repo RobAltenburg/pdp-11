@@ -28,7 +28,7 @@ short dispatch (short opcode);
 #define RTT     0000006 // todo
 
 #define JMP     0000100
-#define RTS     0000200 // todo
+#define RTS     0000200 
 
 #define SPL     0000230 // todo
 #define NOP     0000240
@@ -44,15 +44,15 @@ short dispatch (short opcode);
 #define SCC     0000277 
 #define SWAB    0000300 // todo
 
-#define BR      0004000 // todo
-#define BNE     0010000 // todo
-#define BEQ     0014000 // todo
-#define BGE     0020000 // todo
-#define BLT     0024000 // todo
-#define BGL     0030000 // todo
-#define BLE     0034000 // todo
+#define BR      0000400 // todo
+#define BNE     0001000 // todo
+#define BEQ     0001400 // todo
+#define BGE     0002000 // todo
+#define BLT     0002400 // todo
+#define BGL     0003000 // todo
+#define BLE     0003400 // todo
 
-#define JSR     0004RDD // todo
+#define JSR     0004000 
 
 #define CLR     0005000
 #define COM     0005100 // todo

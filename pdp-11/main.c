@@ -9,32 +9,9 @@
 #include <stdio.h>
 #include "core.h"
 #include "dispatch.h"
+#include "assembler.h"
 
-void process_loop (void)
-{
-    
-    
-    while (1)
-    {
-        
-        
-        short opcode = core_read_word(reg[7]);
-        
-        printf("%o: %o | ", reg[7], opcode);
-        for (int i = 0; i<7; i++) {
-            printf("%o ",reg[i]);
-        }
-        printf("| %o \n",PSW);
-        
-        reg[7] = reg[7] + 2;
-        
-        // if PSW T is set & opcode != RTT, trace trap from 14 (BPT)
-        
-        if (dispatch (opcode) == 1) return;  // process until halt
-        
-    }
-    
-}
+
 
 
 
@@ -44,19 +21,17 @@ int main(int argc, const char * argv[])
     // insert code here...
     printf("PDP-11/40!\n");
     
-    //printf("local char = %d bytes.\n", (int) sizeof(char));
-    //printf("local short = %d bytes.\n\n", (int) sizeof(short));
-    
     reg[7] = 01000;  // Start execution at .ORG 1000
     
+    //load the program into memory
     
-    //load a program into memory
+    short program[] = {MOV +02706, 01700, MOV +02700, 0400, MUL + 027, 02, HALT};
+    //short subroutine[] = {INC +02, MOV +02700, 0, RTS +01};
     
-    short program[] = {JMP + 067, 4, 0176, MOV + 06700, -4, MOV + 02, INC + 02, HALT};
-    for (int i = 0; i < sizeof(program)/2; i++) {
-        core_write_word(program[i], reg[7] + (i * 2));
-    }
+    load_core(program, sizeof(program), 01000);
+    //load_core(subroutine, sizeof(subroutine), 02000);
     
+    command_file (program, sizeof(program), 01000, "/Users/rca/test.simh");;
     
     process_loop();
     
