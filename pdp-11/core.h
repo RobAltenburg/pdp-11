@@ -17,17 +17,23 @@
 char core[1 << 16];
 short reg[8];
 
-#define PSW     core[0177776]
+int interrupt_flag;
+char priority_level;
 
-#define PSW_C   001
-#define PSW_V   002
-#define PSW_Z   004
-#define PSW_N   010
-#define PSW_T   020
+#define PS     core[0177776]
+
+#define PS_C   001
+#define PS_V   002
+#define PS_Z   004
+#define PS_N   010
+#define PS_T   020
 
 #define SP reg[6]
 #define PC reg[7]
 
+#define SIM_RUN     0
+#define SIM_HALT    -1
+#define SIM_WAIT    -2
 
 // memory access functions
 short read_word (char addr);
@@ -40,14 +46,15 @@ void write_byte(char dest_addr, char source_value);
 void dump_core (short orig, short range);
 void load_core (short program[], short length, short start);
 void process_loop (void);
+int fetch_and_dispatch (void);
 
-//program status worf functions
-void psw_set (short values);
-void psw_reset (short values);
-void psw_on_word (short word);
-void psw_on_byte (short byte);
-char psw_test (short values);
-
+//program status word functions
+void ps_set (short values);
+void ps_reset (short values);
+void ps_on_word (short word);
+void ps_on_byte (short byte);
+char ps_test (short values);
+char *ps_string(short word, char *buffer, int buf_size);
 
 void push (short word);
 short pop (void);

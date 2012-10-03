@@ -21,11 +21,14 @@ int main(int argc, const char * argv[])
     // insert code here...
     printf("PDP-11/40!\n");
     
+    interrupt_flag = 0;
+    priority_level = 7; // todo: implement the priority system
+    
     reg[7] = 01000;  // Start execution at .ORG 1000
     
     //load the program into memory
     
-    short program[] = {MOV +02706, 01700, MOV +02700, 0400, MUL + 027, 02, HALT};
+    short program[] = {MOV +02706, 01700, MOV +02700, 0400, CLC, MUL + 027, 02, MOV +02700, 077777, SWAB, HALT};
     //short subroutine[] = {INC +02, MOV +02700, 0, RTS +01};
     
     load_core(program, sizeof(program), 01000);
@@ -36,8 +39,6 @@ int main(int argc, const char * argv[])
     process_loop();
     
   
-    
-
     
     //dump_core(01000, 18);
     

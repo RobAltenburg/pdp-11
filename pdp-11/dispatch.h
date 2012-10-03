@@ -9,10 +9,11 @@
 #ifndef pdp_11_dispatch_h
 #define pdp_11_dispatch_h
 
-short dispatch (short opcode);
+void dispatch (short opcode);
 
 
 // Bit Masks for Opcode patterns
+#define HALF_OP             0177770
 #define ONE_OP              0177700
 #define ONE_AND_A_HALF_OP   0177000
 #define TWO_OP              0170000
@@ -20,17 +21,17 @@ short dispatch (short opcode);
 
 
 #define HALT    0000000
-#define WAIT    0000001 // todo
-#define RTI     0000002 // todo
-#define BPT     0000003 // todo
-#define IOT     0000004 // todo
-#define RESET   0000005 // todo
-#define RTT     0000006 // todo
+#define WAIT    0000001 
+#define RTI     0000002 
+#define BPT     0000003 
+#define IOT     0000004 
+#define RESET   0000005 // todo: finish
+#define RTT     0000006 // todo: finish
 
 #define JMP     0000100
 #define RTS     0000200 
 
-#define SPL     0000230 // todo
+#define SPL     0000230 
 #define NOP     0000240
 #define CLC     0000241 
 #define CLV     0000242 
@@ -42,7 +43,7 @@ short dispatch (short opcode);
 #define SEZ     0000264 
 #define SEN     0000270 
 #define SCC     0000277 
-#define SWAB    0000300 // todo
+#define SWAB    0000300 
 
 #define BR      0000400 // todo
 #define BNE     0001000 // todo
@@ -81,7 +82,7 @@ short dispatch (short opcode);
 #define ADD     0060000 // todo
 
 // One and a Half Operand Instructions
-#define MUL     0070000 // todo
+#define MUL     0070000  
 #define DIV     0071000 // todo
 #define ASH     0072000 // todo
 #define ASHC    0073000 // todo

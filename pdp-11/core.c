@@ -7,38 +7,44 @@
 //
 
 #include <stdio.h>
-
 #include "core.h"
-
-
 
 //short * reg = (short *) (core + 0170000);
 
 void process_loop (void)
 {
-    
-    
-    while (1)
-    {
+
+     
+    while (interrupt_flag != SIM_HALT) {
+        
         
         short opcode = core_read_word(reg[7]);
         
-        
-        printf("%#7o: %#7o | ", reg[7], opcode);
+         
+        printf("%#7o: %#7o | ", reg[7] & 0xFFFF, opcode & 0xFFFF);
         for (int i = 0; i<6; i++) {
-            printf("%#7o ",reg[i]);
+            printf("%#7o ",reg[i] & 0xFFFF);
         }
-        printf("| SP: %o, PSW: %o \n",SP, PSW);
+       
+        printf("| SP: %o, PS: %o \n",SP & 0xFFFF, PS);
         
         PC = PC + 2; // increment the program counter
         
-        // if PSW T is set & opcode != RTT, trace trap from 14 (BPT)
+        // if PS T is set & opcode != RTT, trace trap from 14 (BPT)
         
-        if (dispatch (opcode) == 1) return;  // process until halt
+        dispatch(opcode);
+        
+        do {
+            // check for traps and interrupts
+            
+        } while (interrupt_flag == SIM_WAIT);
+        
+        
         
     }
     
 }
+
 
 // get address uses the address modes to return an address instead of an operand.
 // calculate the effective address given an appropriate address mode
@@ -93,7 +99,7 @@ short get_address (char address_ref)
 // the following reads and writes work on six-bit address references
 short read_word (char address_ref)
 {
-     
+    
     short word;
     switch ((address_ref & 070) >> 3) { // switch on address mode
         case 0: // immediate value
@@ -120,10 +126,10 @@ char read_byte (char address_ref)
     }
     return byte;
 }
-   
+
 void write_word (char dest_address_ref, short source_value)
 {
-    
+    source_value = source_value;
     switch ((dest_address_ref & 070) >> 3) { // switch on address mode
         case 0: // immediate value
             reg[dest_address_ref & 07] = source_value;
@@ -178,18 +184,18 @@ void core_write_word (short word, short offset)
 
 // program status word functions
 
-void psw_set (short values)
+void ps_set (short values)
 {
-    PSW = PSW | values;
+    PS = PS | values;
 }
-void psw_reset (short values)
+void ps_reset (short values)
 {
-    PSW = PSW  & ( 0177777 - values);
+    PS = PS  & ( 0177777 - values);
 }
 
-char psw_test (short values)
+char ps_test (short values)
 {
-    if ((PSW & values) == values) {
+    if ((PS & values) == values) {
         return 1;
     } else {
         return 0;
@@ -197,19 +203,26 @@ char psw_test (short values)
     
 }
 
-void psw_on_word (short word)
+void ps_on_word (short word)
 {
-    word == 0 ? psw_set(PSW_Z) : psw_reset(PSW_Z);
-    word < 0 ? psw_set(PSW_N) : psw_reset(PSW_N);
+    word == 0 ? ps_set(PS_Z) : ps_reset(PS_Z);
+    word < 0 ? ps_set(PS_N) : ps_reset(PS_N);
 }
 
-void psw_on_byte (short byte)
+void ps_on_byte (short byte)
 {
-    byte == 0 ? psw_set(PSW_Z) : psw_reset(PSW_Z);
-    byte < 0 ? psw_set(PSW_N) : psw_reset(PSW_N);
+    byte == 0 ? ps_set(PS_Z) : ps_reset(PS_Z);
+    byte < 0 ? ps_set(PS_N) : ps_reset(PS_N);
 }
 
-
+char *ps_string(short word, char *buffer, int buf_size)
+{
+    for (int i = 0; i <= 3; i++) {
+        *buffer-- = (word & 1) + '0';
+        word >>= 1;
+    }
+    return buffer;
+}
 
 // stack functions
 
@@ -235,7 +248,7 @@ void dump_core (short orig, short range)
 
 void load_core (short program[], short length, short start)
 {
-for (int i = 0; i < length/2; i++) {
-    core_write_word(program[i], start + (i * 2));
-}
+    for (int i = 0; i < length/2; i++) {
+        core_write_word(program[i], start + (i * 2));
+    }
 }
