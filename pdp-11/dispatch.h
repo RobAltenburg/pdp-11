@@ -15,9 +15,10 @@ void dispatch (short opcode);
 // Bit Masks for Opcode patterns
 #define HALF_OP             0177770
 #define ONE_OP              0177700
+#define BRANCH_INSTRUCTION  0177400
 #define ONE_AND_A_HALF_OP   0177000
 #define TWO_OP              0170000
-#define BRANCH_INSTRUCTION  0177400
+
 
 
 #define HALT    0000000
@@ -43,9 +44,9 @@ void dispatch (short opcode);
 #define SEZ     0000264 
 #define SEN     0000270 
 #define SCC     0000277 
-#define SWAB    0000300 
+#define SWAB    0000300 // todo: finish
 
-#define BR      0000400 // todo
+#define BR      0000400 
 #define BNE     0001000 // todo
 #define BEQ     0001400 // todo
 #define BGE     0002000 // todo

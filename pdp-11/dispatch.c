@@ -97,7 +97,11 @@ void doSWAB (short opcode) {
     ps_reset(PS_C + PS_V);
     // todo: finish flags
 }
+// branch instructions
 
+void doBR(short opcode) {
+    PC = PC + (opcode & 0377);
+}
 
 // one and a half operand instructions
 
@@ -178,30 +182,35 @@ void dispatch (short opcode) {
                         case ADC:   doADC (opcode); break;
                         case SWAB:  doSWAB (opcode); break;
                         default:
-                            switch (opcode & ONE_AND_A_HALF_OP) {
-                                case JSR: doJSR(opcode); break;
-                                case MUL: doMUL(opcode); break;
+                            switch (opcode & BRANCH_INSTRUCTION) {
+                                case BR: doBR (opcode); break;
                                 default:
-                                    switch (opcode & TWO_OP) { // Two Operand Instructions
-                                        case MOV: doMOV(opcode); break;
-                                        case NOP:  printf("NOP\n"); break;
+                                    switch (opcode & ONE_AND_A_HALF_OP) {
+                                        case JSR: doJSR(opcode); break;
+                                        case MUL: doMUL(opcode); break;
                                         default:
-                                            
-                                            // Processor Status Word Instructions
-                                            switch (opcode) {
-                                                case CLC: ps_reset(opcode - 0240); break;
-                                                case CLV: ps_reset(opcode - 0240); break;
-                                                case CLZ: ps_reset(opcode - 0240); break;
-                                                case CLN: ps_reset(opcode - 0240); break;
-                                                case CCC: ps_reset(PS_C + PS_V + PS_Z + PS_N); break;
-                                                case SEC: ps_set(opcode - 0260); break;
-                                                case SEV: ps_set(opcode - 0260); break;
-                                                case SEZ: ps_set(opcode - 0260); break;
-                                                case SEN: ps_set(opcode - 0260); break;
-                                                case SCC: ps_set(PS_C + PS_V + PS_Z + PS_N); break;
-                                                    
+                                            switch (opcode & TWO_OP) { // Two Operand Instructions
+                                                case MOV: doMOV(opcode); break;
+                                                case NOP:  printf("NOP\n"); break;
                                                 default:
-                                                    printf ("WARNING: Unknown opcode (%o), treating it like NOP.\n", opcode);
+                                                    
+                                                    // Processor Status Word Instructions
+                                                    switch (opcode) {
+                                                        case CLC: ps_reset(opcode - 0240); break;
+                                                        case CLV: ps_reset(opcode - 0240); break;
+                                                        case CLZ: ps_reset(opcode - 0240); break;
+                                                        case CLN: ps_reset(opcode - 0240); break;
+                                                        case CCC: ps_reset(PS_C + PS_V + PS_Z + PS_N); break;
+                                                        case SEC: ps_set(opcode - 0260); break;
+                                                        case SEV: ps_set(opcode - 0260); break;
+                                                        case SEZ: ps_set(opcode - 0260); break;
+                                                        case SEN: ps_set(opcode - 0260); break;
+                                                        case SCC: ps_set(PS_C + PS_V + PS_Z + PS_N); break;
+                                                            
+                                                        default:
+                                                            printf ("WARNING: Unknown opcode (%o), treating it like NOP.\n", opcode);
+                                                            break;
+                                                    }
                                                     break;
                                             }
                                             break;
@@ -214,7 +223,6 @@ void dispatch (short opcode) {
             }
             break;
     }
-    
     
 }
 
