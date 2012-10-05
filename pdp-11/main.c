@@ -28,7 +28,7 @@ int main(int argc, const char * argv[])
     
     //load the program into memory
     
-    short program[] = {MOV +02706, 01700, MOV +02700, 0400, CLC, MUL + 027, 02, MOV +02700, 077777, SWAB, HALT};
+    short program[] = {MOV +02706, 01700, MOV +02700, 0400, BR + 04, MUL + 027, 02, MOV +02700, 077777, SWAB, HALT};
     //short subroutine[] = {INC +02, MOV +02700, 0, RTS +01};
     
     load_core(program, sizeof(program), 01000);

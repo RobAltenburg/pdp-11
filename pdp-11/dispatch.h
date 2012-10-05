@@ -46,15 +46,7 @@ void dispatch (short opcode);
 #define SCC     0000277 
 #define SWAB    0000300 // todo: finish
 
-#define BR      0000400 
-#define BNE     0001000 // todo
-#define BEQ     0001400 // todo
-#define BGE     0002000 // todo
-#define BLT     0002400 // todo
-#define BGL     0003000 // todo
-#define BLE     0003400 // todo
-
-#define JSR     0004000 
+#define JSR     0004000
 
 #define CLR     0005000
 #define COM     0005100 // todo
@@ -97,14 +89,23 @@ void dispatch (short opcode);
 #define SOB     0077000 // todo
 
 // Branch Instructions
-#define BPL     01000000 // todo
-#define BMI     01004000 // todo
-#define BHI     01010000 // todo
-#define BLOS    01014000 // todo
-#define BVC     01020000 // todo
-#define BVS     01024000 // todo
-#define BCC     01030000 // todo       // BHIS
-#define BCS     01034000 // todo       // BLO
+#define BR      0000400
+#define BNE     0001000
+#define BEQ     0001400
+#define BGE     0002000
+#define BLT     0002400
+#define BGT     0003000
+#define BLE     0003400
+#define BPL     0100000
+#define BMI     0100400
+#define BHI     0101000
+#define BLOS    0101400
+#define BVC     0102000
+#define BVS     0102400
+#define BCC     0103000
+#define BHIS    0103000
+#define BCS     0103400
+#define BLO     0103400
 
 // Byte Instructions
 #define CLRB    0105000

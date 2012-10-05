@@ -97,11 +97,99 @@ void doSWAB (short opcode) {
     ps_reset(PS_C + PS_V);
     // todo: finish flags
 }
+
 // branch instructions
 
 void doBR(short opcode) {
-    PC = PC + (opcode & 0377);
+    PC = PC + ((opcode & 0377) << 1);
 }
+
+void doBNE(short opcode) {
+    if  (! ps_test(PS_Z)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBEQ(short opcode) {
+    if  (ps_test(PS_Z)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBPL(short opcode) {
+    if  (! ps_test(PS_N)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBMI(short opcode) {
+    if  (ps_test(PS_N)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBVC(short opcode) {
+    if  (! ps_test(PS_V)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBVS(short opcode) {
+    if  (ps_test(PS_V)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBCC(short opcode) {
+    if  (! ps_test(PS_C)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBCS(short opcode) {
+    if  (ps_test(PS_C)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBGE(short opcode) {
+    if  ((ps_test(PS_N)==0) | (ps_test(PS_V)==0)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBLT(short opcode) {  
+    if  ((ps_test(PS_N)==1) | (ps_test(PS_V)==1)){
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBGT(short opcode) {  
+    if  (ps_test(PS_N) ^ ps_test(PS_V)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBLE(short opcode) {
+    if  ((ps_test(PS_N) == 0) ^ (ps_test(PS_V) == 0)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBHI(short opcode) {
+    if   ((ps_test(PS_C) == 0) ^ (ps_test(PS_Z) == 0)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+void doBLOS(short opcode) {
+    if  (ps_test(PS_C) | ps_test(PS_Z)) {
+        PC = PC + ((opcode & 0377) << 1);
+    }
+}
+
+
+
 
 // one and a half operand instructions
 
@@ -184,6 +272,19 @@ void dispatch (short opcode) {
                         default:
                             switch (opcode & BRANCH_INSTRUCTION) {
                                 case BR: doBR (opcode); break;
+                                case BNE: doBNE (opcode); break;
+                                case BEQ: doBEQ (opcode); break;
+                                case BGE: doBGE (opcode); break;
+                                case BLT: doBLT (opcode); break;
+                                case BGT: doBGT (opcode); break;
+                                case BLE: doBLE (opcode); break;
+                                case BPL: doBPL (opcode); break;
+                                case BMI: doBMI (opcode); break;
+                                case BHI: doBHI (opcode); break;
+                                case BLOS: doBLOS (opcode); break;
+                                case BVC: doBVC (opcode); break;
+                                case BCC: doBCC (opcode); break;
+                                case BCS: doBCS (opcode); break;
                                 default:
                                     switch (opcode & ONE_AND_A_HALF_OP) {
                                         case JSR: doJSR(opcode); break;
