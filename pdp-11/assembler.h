@@ -10,8 +10,9 @@
 #define pdp_11_assembler_h
 
 #include "dispatch.h"
+#include "core.h"
 
 void assemble  (short program[], short length,  const char *filename);
-void command_file (short program[], short length, short start, char *filename);
+void core_to_commands (char *filename);
 
 #endif

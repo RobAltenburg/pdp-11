@@ -7,17 +7,28 @@
 //
 
 #include <stdio.h>
+#include "assembler.h"
 
 // todo: figure out the binary format. Till then...
 // builds a simh command file
-void command_file (short program[], short length, short start, char *filename)
+void core_to_commands (char *filename)
 {
     FILE *fp;
+    short temp_w;
     fp = fopen(filename, "w");
-    for (int i = 0; i < length/2; i++) {
-        fprintf(fp, "d %o %o\n", start + (i * 2), program[i]);
+    for (int i = 0; i < MEMSIZE/ 2; i++)  {
+        if (i % 2 == 0) {
+        temp_w = core_read_word(i);
+        if (temp_w) {fprintf(fp, "d %o %ho\n", i, temp_w);}
+        }
     }
-    fprintf(fp, "d PC %o\n",start);
-    fprintf(fp, "br %o\ng\n",start);
+    
+    for (int i = 0; i <= 5; i++) {
+        if (reg[i]) fprintf(fp, "d R%o %ho\n", i, reg[i]);
+    }
+    fprintf(fp, "d SP %ho\n", SP);
+    fprintf(fp, "d PC %ho\n", PC);
+    
+    fprintf(fp, "br %o\ng\n",reg[7]);
     fclose(fp);
 }

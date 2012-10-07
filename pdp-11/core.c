@@ -21,12 +21,12 @@ void process_loop (void)
         short opcode = core_read_word(reg[7]);
         
          
-        printf("%#7o: %#7o | ", reg[7] & 0xFFFF, opcode & 0xFFFF);
+        printf("%#7o: %#7ho | ", reg[7], opcode);
         for (int i = 0; i<6; i++) {
-            printf("%#7o ",reg[i] & 0xFFFF);
+            printf("%#7ho ",reg[i]);
         }
        
-        printf("| SP: %o, ",SP & 0xFFFF);
+        printf("| SP: %ho, ",SP);
         if(ps_test(PS_N)) printf("N");
         if(ps_test(PS_Z)) printf("Z");
         if(ps_test(PS_V)) printf("V");
@@ -176,7 +176,7 @@ void core_write_byte (char byte, short offset)
 
 short core_read_word(short offset)
 {
-    if (offset % 2 > 0 ) { printf("ERROR: attempt to read unaligned word.\n");}
+    if (offset % 2 > 0 ) { printf("ERROR: attempt to read unaligned word (%o)\n", offset);}
     return  *(short *)(core + offset); //read words from byte array
 }
 
@@ -247,13 +247,14 @@ void dump_core (short orig, short range)
 {
     printf("CORE DUMP:\n");
     for (short i = orig; i <= orig + range; i = i + 2) {
-        printf("%o:  %o\n", i, *(short *)(core + i));
+        printf("%o:  %ho\n", i, *(short *)(core + i));
     }
 }
 
 void load_core (short program[], short length, short start)
 {
     for (int i = 0; i < length/2; i++) {
+        // printf("load: %o: %ho\n", start + (i * 2), program[i]);
         core_write_word(program[i], start + (i * 2));
     }
 }

@@ -20,7 +20,9 @@ short reg[8];
 int interrupt_flag;
 char priority_level;
 
-#define PS     core[0177776]
+#define MEMSIZE 0177776
+
+#define PS     core[MEMSIZE]
 
 #define PS_C   001
 #define PS_V   002
