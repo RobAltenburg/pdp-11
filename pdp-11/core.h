@@ -54,7 +54,6 @@ void ps_reset (short values);
 void ps_on_word (short word);
 void ps_on_byte (short byte);
 char ps_test (short values);
-char *ps_string(short word, char *buffer, int buf_size);
 
 void push (short word);
 short pop (void);
@@ -69,5 +68,8 @@ short core_read_word(short offset);
 
 void core_write_byte(char byte, short offset);
 void core_write_word (short word, short offset);
+
+short word_flip(short word);
+char byte_flip(char byte);
 
 #endif

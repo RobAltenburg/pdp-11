@@ -26,7 +26,12 @@ void process_loop (void)
             printf("%#7o ",reg[i] & 0xFFFF);
         }
        
-        printf("| SP: %o, PS: %o \n",SP & 0xFFFF, PS);
+        printf("| SP: %o, ",SP & 0xFFFF);
+        if(ps_test(PS_N)) printf("N");
+        if(ps_test(PS_Z)) printf("Z");
+        if(ps_test(PS_V)) printf("V");
+        if(ps_test(PS_C)) printf("C");
+        printf("\n");
         
         PC = PC + 2; // increment the program counter
         
@@ -251,4 +256,18 @@ void load_core (short program[], short length, short start)
     for (int i = 0; i < length/2; i++) {
         core_write_word(program[i], start + (i * 2));
     }
+}
+
+short word_flip(short word) {
+    short hi, lo;
+    lo = word & 0xFF;
+    hi = (word >> 8) & 0xFF;
+    return (lo << 8) + hi;
+}
+
+char byte_flip(char byte) {
+    short hi, lo;
+    lo = byte & 0xF;
+    hi = (byte >> 4) & 0xF;
+    return (lo << 4) + hi;
 }

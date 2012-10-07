@@ -11,14 +11,12 @@
 
 void dispatch (short opcode);
 
-
 // Bit Masks for Opcode patterns
 #define HALF_OP             0177770
 #define ONE_OP              0177700
 #define BRANCH_INSTRUCTION  0177400
 #define ONE_AND_A_HALF_OP   0177000
 #define TWO_OP              0170000
-
 
 
 #define HALT    0000000
@@ -49,13 +47,13 @@ void dispatch (short opcode);
 #define JSR     0004000
 
 #define CLR     0005000
-#define COM     0005100 // todo
+#define COM     0005100
 #define INC     0005200
-#define DEC     0005300 // todo
-#define NEG     0005400 // todo
+#define DEC     0005300 
+#define NEG     0005400 
 #define ADC     0005500
 #define SBC     0005600 // todo
-#define TST     0005700 // todo
+#define TST     0005700 
 
 #define ROR     0006000 // todo
 #define ROL     0006100 // todo
@@ -109,13 +107,13 @@ void dispatch (short opcode);
 
 // Byte Instructions
 #define CLRB    0105000
-#define COMB    0105100 // todo
+#define COMB    0105100 
 #define INCB    0105200
-#define DECB    0105300 // todo
-#define NEGB    0105400 // todo
+#define DECB    0105300 
+#define NEGB    0105400 
 #define ADCB    0105500 // todo
 #define SBCB    0105600 // todo
-#define TSTB    0105700 // todo
+#define TSTB    0105700 
 
 #define RORB    0106000 // todo
 #define ROLB    0106100 // todo
