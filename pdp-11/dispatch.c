@@ -151,10 +151,10 @@ void doTST (short opcode) {
 
 void doTSTB (short opcode) {
     ps_on_byte(read_byte((opcode & 077)));
-    ps_reset(PS_V + PS_C);    
+    ps_reset(PS_V + PS_C);
 }
 
-void doASR (short opcode) { 
+void doASR (short opcode) {
     short temp_w;
     temp_w = read_word((opcode & 077));
     temp_w & 01 ? ps_set(PS_C) : ps_reset(PS_C);
@@ -254,6 +254,52 @@ void doADC (short opcode) {
     ps_on_word (temp_w);
 }
 
+void doADCB (short opcode) {
+    char temp_b;
+    temp_b = read_word((opcode & 077));
+    (temp_b == 0177) & ps_test(PS_C) ? ps_set(PS_V) : ps_reset(PS_V);
+    (temp_b == 0377) & ps_test(PS_C) ? ps_set(PS_C) : ps_reset(PS_C);
+    if (ps_test (PS_C)) {
+        temp_b++;
+        write_word(opcode & 077, temp_b);
+    }
+    ps_on_word (temp_b);
+}
+
+void doSBC (short opcode) {
+    short temp_w;
+    temp_w = read_word((opcode & 077));
+    (temp_w == 0100000) ? ps_set(PS_V) : ps_reset(PS_V);
+    (temp_w == 0) ? ps_reset(PS_C) : ps_set(PS_C);
+    if (ps_test (PS_C)) {
+        temp_w--;
+        (temp_w < 0) ? ps_set(PS_N) : ps_reset(PS_N);
+        (temp_w == 0) ? ps_set(PS_Z) : ps_reset(PS_Z);
+        write_word(opcode & 077, temp_w);
+    }
+    ps_on_word (temp_w);
+}
+
+void doSBCB (short opcode) {
+    char temp_b;
+    temp_b = read_word((opcode & 077));
+    (temp_b == 0200) ? ps_set(PS_V) : ps_reset(PS_V);
+    (temp_b == 0) ? ps_reset(PS_C) : ps_set(PS_C);
+    if (ps_test (PS_C)) {
+        temp_b--;
+        (temp_b < 0) ? ps_set(PS_N) : ps_reset(PS_N);
+        (temp_b == 0) ? ps_set(PS_Z) : ps_reset(PS_Z);
+        write_word(opcode & 077, temp_b);
+    }
+    ps_on_word (temp_b);
+}
+
+void doSXT (short opcode) { // todo fix
+    ps_test(PS_N) ? write_word(opcode & 077, -0177777) : write_word(opcode & 077, 0);
+    if (!ps_test(PS_N)) ps_reset(PS_Z);
+}
+
+
 void doSWAB (short opcode) {
     short temp_w;
     temp_w = read_word((opcode & 077));
@@ -323,13 +369,13 @@ void doBGE(short opcode) {
     }
 }
 
-void doBLT(short opcode) {  
+void doBLT(short opcode) {
     if  ((ps_test(PS_N)==1) | (ps_test(PS_V)==1)){
         PC = PC + ((opcode & 0377) << 1);
     }
 }
 
-void doBGT(short opcode) {  
+void doBGT(short opcode) {
     if  (ps_test(PS_N) ^ ps_test(PS_V)) {
         PC = PC + ((opcode & 0377) << 1);
     }
@@ -365,15 +411,13 @@ void doJSR (short opcode) {
 }
 
 
-
 void doMUL (short opcode) {
     char reg_number = (opcode & 0700) >> 6;
-    int result = (int) read_word((opcode & 0700) >> 6) * read_word(opcode & 077);
-    //int temp_int = reg[temp_register] * read_word(opcode & 077); // porting: make sure int is at least 32-bits
+    long result = read_word((opcode & 0700) >> 6) * read_word((opcode & 077));
     reg[reg_number] = result & 0177777;
     ps_reset(PS_N + PS_Z + PS_V);
     
-    if ((result < (-2^15)) || (result > (2^15) -1)) ps_set(PS_C);
+    if ((result < MIN_WORD) || (result > MAX_WORD)) ps_set(PS_C);
     
     if (reg_number % 2 == 0) {
         reg[reg_number + 1] = result & 0177777;
@@ -387,6 +431,29 @@ void doMUL (short opcode) {
     
 }
 
+
+void doDIV (short opcode) {
+    char reg_number = (opcode & 0700) >> 6;
+    long source = (reg[reg_number] << 16) + reg[reg_number + 1];
+    short divisor = read_word((opcode & 077));
+    if (divisor) {
+        if (abs(reg[reg_number]) > abs(divisor)) {
+            ps_set(PS_V);
+        } else {
+    reg[reg_number] = (short) source / divisor;
+    reg[reg_number +1] = (short) source % divisor;
+        ps_on_word(reg[reg_number]);
+        }
+        ps_reset(PS_C);
+    } else {
+        // todo: trap division by zero
+        ps_set(PS_V);
+        ps_set(PS_C);
+    }
+
+   
+}
+
 // two operarnd instructions
 
 void doMOV (short opcode) {
@@ -396,14 +463,57 @@ void doMOV (short opcode) {
     ps_reset(PS_V);
 }
 
+void doMOVB (short opcode) {
+    short temp_b = read_byte((opcode & 07700) >> 6);
+    write_byte(opcode & 0177, temp_b);
+    ps_on_byte (temp_b);
+    ps_reset(PS_V);
+}
+
+void doCMP (short opcode) {
+    short source_w = read_word((opcode & 07700) >> 6);
+    short dest_w = read_word((opcode & 077));
+    
+    short result = (source_w - dest_w) & 0177777;
+    
+    (source_w == dest_w) ? ps_set(PS_Z) : ps_reset(PS_Z);
+    (source_w < dest_w) ? ps_set(PS_N) : ps_reset(PS_N);
+    
+    source_w = source_w >> 15;
+    dest_w = dest_w >> 15;
+    if ((source_w ^ dest_w ) & (dest_w == result >> 15)) {
+        ps_set(PS_V);
+    } else {
+        ps_reset(PS_V);
+    }
+    
+    // todo... test for PS_C
+}
+
+void doCMPB (short opcode) {
+    char source_b = read_byte((opcode & 07700) >> 6);
+    char dest_b = read_byte((opcode & 077));
+    char result = source_b - dest_b;
+    (source_b == dest_b) ? ps_set(PS_Z) : ps_reset(PS_Z);
+    (source_b < dest_b) ? ps_set(PS_N) : ps_reset(PS_N);
+    
+    source_b = source_b >> 07;
+    dest_b = dest_b >> 07;
+    if ((source_b ^ dest_b ) & (dest_b == result >> 07)) {
+        ps_set(PS_V);
+    } else {
+        ps_reset(PS_V);
+    }
+    
+    // todo... test for PS_C
+}
 
 void dispatch (short opcode) {
-    
     
     switch (opcode >> 1) {
         case 000:  // Zero Operand Instructions
             switch (opcode) {
-                case HALT: printf("Halt\n"); interrupt_flag = SIM_HALT; break;
+                case HALT: interrupt_flag = SIM_HALT; break;
                 case WAIT: interrupt_flag = SIM_WAIT; break;
                 case RTI: doRTI(); break;
                 case BPT: doBPT(); break;
@@ -417,6 +527,7 @@ void dispatch (short opcode) {
             switch (opcode & HALF_OP) {
                 case RTS:   doRTS (opcode); break;
                 case SPL:   doSPL (opcode); break;
+                case NOP:   break;
                 default:
                     
                     switch (opcode & ONE_OP) { // One Operand Instructions
@@ -442,31 +553,49 @@ void dispatch (short opcode) {
                         case ROL:   doROL (opcode); break;
                         case ROLB:  doROLB (opcode); break;
                         case ADC:   doADC (opcode); break;
+                        case ADCB:  doADCB (opcode); break;
+                        case SBC:   doSBC (opcode); break;
+                        case SBCB:  doSBCB (opcode); break;
                         case SWAB:  doSWAB (opcode); break;
+                        case SXT:   doSXT (opcode); break;
                         default:
                             switch (opcode & BRANCH_INSTRUCTION) {
-                                case BR: doBR (opcode); break;
-                                case BNE: doBNE (opcode); break;
-                                case BEQ: doBEQ (opcode); break;
-                                case BGE: doBGE (opcode); break;
-                                case BLT: doBLT (opcode); break;
-                                case BGT: doBGT (opcode); break;
-                                case BLE: doBLE (opcode); break;
-                                case BPL: doBPL (opcode); break;
-                                case BMI: doBMI (opcode); break;
-                                case BHI: doBHI (opcode); break;
-                                case BLOS: doBLOS (opcode); break;
-                                case BVC: doBVC (opcode); break;
-                                case BCC: doBCC (opcode); break;
-                                case BCS: doBCS (opcode); break;
+                                case BR:    doBR (opcode); break;
+                                case BNE:   doBNE (opcode); break;
+                                case BEQ:   doBEQ (opcode); break;
+                                case BGE:   doBGE (opcode); break;
+                                case BLT:   doBLT (opcode); break;
+                                case BGT:   doBGT (opcode); break;
+                                case BLE:   doBLE (opcode); break;
+                                case BPL:   doBPL (opcode); break;
+                                case BMI:   doBMI (opcode); break;
+                                case BHI:   doBHI (opcode); break;
+                                case BLOS:  doBLOS (opcode); break;
+                                case BVC:   doBVC (opcode); break;
+                                case BCC:   doBCC (opcode); break;
+                                case BCS:   doBCS (opcode); break;
                                 default:
                                     switch (opcode & ONE_AND_A_HALF_OP) {
                                         case JSR: doJSR(opcode); break;
                                         case MUL: doMUL(opcode); break;
+                                        case DIV: doDIV(opcode); break;
+                                            //case ASH: doASH(opcode); break;
+                                            //case ASHC: doASHC(opcode); break;
+                                            //case XOR: doXOR(opcode); break;
                                         default:
                                             switch (opcode & TWO_OP) { // Two Operand Instructions
-                                                case MOV: doMOV(opcode); break;
-                                                case NOP:  printf("NOP\n"); break;
+                                                case MOV:   doMOV(opcode); break;
+                                                case MOVB:  doMOVB(opcode); break;
+                                                case CMP:   doCMP(opcode); break;
+                                                case CMPB:  doCMPB(opcode); break;
+                                                    //case ADD:   doADD(opcode); break;
+                                                    //case SUB:   doSUB(opcode); break;
+                                                    //case BIT:   doBIT(opcode); break;
+                                                    //case BITB:   doBITB(opcode); break;
+                                                    //case BIC:   doBIC(opcode); break;
+                                                    //case BICB:   doBICB(opcode); break;
+                                                    //case BIS:   doBIS(opcode); break;
+                                                    //case BISB:   doBISB(opcode); break;
                                                 default:
                                                     
                                                     // Processor Status Word Instructions

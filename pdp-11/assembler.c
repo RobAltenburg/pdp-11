@@ -29,6 +29,6 @@ void core_to_commands (char *filename)
     fprintf(fp, "d SP %ho\n", SP);
     fprintf(fp, "d PC %ho\n", PC);
     
-    fprintf(fp, "br %o\ng\n",reg[7]);
+    fprintf(fp, "br %ho\ng\n",reg[7]);
     fclose(fp);
 }

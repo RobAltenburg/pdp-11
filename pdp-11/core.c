@@ -13,32 +13,32 @@
 
 void process_loop (void)
 {
-
-     
+    
+    
     while (interrupt_flag != SIM_HALT) {
         
         
         short opcode = core_read_word(reg[7]);
-        
-         
-        printf("%#7o: %#7ho | ", reg[7], opcode);
-        for (int i = 0; i<6; i++) {
-            printf("%#7ho ",reg[i]);
-        }
-       
-        printf("| SP: %ho, ",SP);
-        if(ps_test(PS_N)) printf("N");
-        if(ps_test(PS_Z)) printf("Z");
-        if(ps_test(PS_V)) printf("V");
-        if(ps_test(PS_C)) printf("C");
-        printf("\n");
+        printf("%#7o: %#7ho | ", reg[7], opcode);      
         
         PC = PC + 2; // increment the program counter
         
         // if PS T is set & opcode != RTT, trace trap from 14 (BPT)
         
         dispatch(opcode);
+            
+        for (int i = 0; i<6; i++) {
+            printf("%#7ho ",reg[i]);
+        }
         
+        printf("| SP: %ho, ",SP);
+        if(ps_test(PS_N)) printf("N");
+        if(ps_test(PS_Z)) printf("Z");
+        if(ps_test(PS_V)) printf("V");
+        if(ps_test(PS_C)) printf("C");
+        printf("\n");
+
+    
         do {
             // check for traps and interrupts
             
@@ -272,3 +272,39 @@ char byte_flip(char byte) {
     hi = (byte >> 4) & 0xF;
     return (lo << 4) + hi;
 }
+
+// perform operations on word values, setting flags.
+//short word_operation (signed short t1, signed short t2, char operation, char *carry_flag, char *overflow_flag)
+//{
+//    const short word_max = 077777;
+//    const short word_min = ~word_max;
+//    long testvar;
+//    
+//    if (t2) {
+//        switch (operation) {
+//            case '+': testvar = t1 + t2; break;
+//            case '-': testvar = t1 - t2; break;
+//            case '*': testvar = t1 * t2; break;
+//            case '/': testvar = t1 / t2; break;
+//            default: printf ("unknown operation\n");
+//        }
+//        
+//        if ((testvar < word_min) || (testvar > word_max)) {
+//            *carry_flag = 1;
+//        } else {
+//            *carry_flag = 0;
+//        }
+//        
+//        if ((testvar < (word_min >> 1)) || (testvar > (word_max >> 1))) {
+//            *overflow_flag = 1;
+//        } else {
+//            *overflow_flag = 0;
+//        }
+//    } else {
+//        printf("ERROR: Division by zero\n"); // todo: trap this
+//    }
+//    
+//    return (short) testvar;
+//}
+
+

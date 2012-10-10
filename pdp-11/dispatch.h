@@ -9,6 +9,8 @@
 #ifndef pdp_11_dispatch_h
 #define pdp_11_dispatch_h
 
+#include <stdlib.h>
+
 void dispatch (short opcode);
 
 // Bit Masks for Opcode patterns
@@ -42,7 +44,7 @@ void dispatch (short opcode);
 #define SEZ     0000264 
 #define SEN     0000270 
 #define SCC     0000277 
-#define SWAB    0000300 // todo: finish
+#define SWAB    0000300 
 
 #define JSR     0004000
 
@@ -52,25 +54,26 @@ void dispatch (short opcode);
 #define DEC     0005300 
 #define NEG     0005400 
 #define ADC     0005500
-#define SBC     0005600 // todo
+#define SBC     0005600 
 #define TST     0005700 
 
-#define ROR     0006000 // todo
-#define ROL     0006100 // todo
-#define ASR     0006200 // todo
-#define ASL     0006300 // todo
+#define ROR     0006000 
+#define ROL     0006100 
+#define ASR     0006200 
+#define ASL     0006300 
 #define MARK    0006400 // todo
 #define MFPI    0006500 // todo
 #define MTPI    0006600 // todo
-#define SXT     0006700 // todo
+#define SXT     0006700 
 
 // Two Operand Instructions
 #define MOV     0010000
-#define CMP     0020000 // todo
+#define CMP     0020000 
 #define BIT     0030000 // todo
 #define BIC     0040000 // todo
 #define BIS     0050000 // todo
 #define ADD     0060000 // todo
+#define SUB     0160000 // todo
 
 // One and a Half Operand Instructions
 #define MUL     0070000  
@@ -111,23 +114,23 @@ void dispatch (short opcode);
 #define INCB    0105200
 #define DECB    0105300 
 #define NEGB    0105400 
-#define ADCB    0105500 // todo
-#define SBCB    0105600 // todo
+#define ADCB    0105500 
+#define SBCB    0105600 
 #define TSTB    0105700 
 
-#define RORB    0106000 // todo
-#define ROLB    0106100 // todo
-#define ASRB    0106200 // todo
-#define ASLB    0106300 // todo
+#define RORB    0106000 
+#define ROLB    0106100 
+#define ASRB    0106200 
+#define ASLB    0106300 
 
 #define MFPD    0106500 // todo
 #define MTPD    0106600 // todo
 
-#define MOVB    0110000 // todo
-#define CMPB    0120000 // todo
+#define MOVB    0110000 
+#define CMPB    0120000 
 #define BITB    0130000 // todo
 #define BICB    0140000 // todo
-#define SUB     0160000 // todo
+
 
 
 #endif

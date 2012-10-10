@@ -37,6 +37,9 @@ char priority_level;
 #define SIM_HALT    -1
 #define SIM_WAIT    -2
 
+#define MAX_WORD 0177777
+#define MIN_WORD ~MAX_WORD
+
 // memory access functions
 short read_word (char addr);
 char read_byte (char addr);
@@ -73,5 +76,7 @@ void core_write_word (short word, short offset);
 
 short word_flip(short word);
 char byte_flip(char byte);
+
+short word_operation (signed short t1, signed short t2, char operation, char *carry_flag, char *overflow_flag);
 
 #endif
