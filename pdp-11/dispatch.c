@@ -440,9 +440,9 @@ void doDIV (short opcode) {
         if (abs(reg[reg_number]) > abs(divisor)) {
             ps_set(PS_V);
         } else {
-    reg[reg_number] = (short) source / divisor;
-    reg[reg_number +1] = (short) source % divisor;
-        ps_on_word(reg[reg_number]);
+            reg[reg_number] = (short) source / divisor;
+            reg[reg_number +1] = (short) source % divisor;
+            ps_on_word(reg[reg_number]);
         }
         ps_reset(PS_C);
     } else {
@@ -450,8 +450,35 @@ void doDIV (short opcode) {
         ps_set(PS_V);
         ps_set(PS_C);
     }
+    
+    
+}
 
-   
+void doASH (short opcode) {
+    
+    short value = reg[(opcode & 0700) >> 6];
+    short shift = (read_word((opcode & 077)) & 037);
+    short shift_left = !((read_word((opcode & 077)) >> 6) & 01);
+    short old_c;
+    
+    if (shift_left) {
+        for (short i = 0; i < shift; i++) {
+            if (((value >> 15) & 1) != ((value >> 14) & 1)) ps_set(PS_V);
+            if (ps_test(PS_C)) { old_c = 1;} else { old_c = 0;}
+            (value & 0100000) ? ps_set(PS_C) : ps_reset(PS_C);
+            value =  (value << 1) | old_c;
+            
+        }
+    } else {
+        for (short i = 0; i < shift; i++) {
+            if (((value >> 15) & 1) != ((value >> 14) & 1)) ps_set(PS_V);
+            (value & 1) ? ps_set(PS_C) : ps_reset(PS_C);
+            value = (value & 0100000) | (value >> 1);
+        }
+        ps_on_word(value);
+    }
+    reg[(opcode & 0700) >> 6] = value;
+    
 }
 
 // two operarnd instructions
@@ -579,7 +606,7 @@ void dispatch (short opcode) {
                                         case JSR: doJSR(opcode); break;
                                         case MUL: doMUL(opcode); break;
                                         case DIV: doDIV(opcode); break;
-                                            //case ASH: doASH(opcode); break;
+                                        case ASH: doASH(opcode); break;
                                             //case ASHC: doASHC(opcode); break;
                                             //case XOR: doXOR(opcode); break;
                                         default:
