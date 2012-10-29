@@ -78,8 +78,8 @@ void dispatch (short opcode);
 // One and a Half Operand Instructions
 #define MUL     0070000  
 #define DIV     0071000 
-#define ASH     0072000 // todo
-#define ASHC    0073000 // todo
+#define ASH     0072000 
+#define ASHC    0073000 
 #define XOR     0074000 // todo
 
 #define FADD    0075000 // todo

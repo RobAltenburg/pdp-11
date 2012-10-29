@@ -481,6 +481,37 @@ void doASH (short opcode) {
     
 }
 
+void doASHC (short opcode) {
+    
+    short rnum = (opcode & 0700) >> 6;
+    short value = reg[rnum];
+    short value1 = reg[rnum + 1];;  // todo: must be < 8
+    short shift = (read_word((opcode & 077)) & 037);
+    short shift_left = !((read_word((opcode & 077)) >> 6) & 01);
+    
+    int dw_value =  (value << 16) | value1;
+    ps_reset(PS_V);
+    
+    for (int i = 0; i <= shift; i++) {
+        if (shift_left) {
+            if (((dw_value >> 31) & 1) ^ ((dw_value >> 30) & 1)) ps_set(PS_V);
+            (dw_value & 01) ? ps_set(PS_C) : ps_reset(PS_C);
+            dw_value = dw_value >> 1;  // rely on implementation to propigate the high bit
+        } else {
+            // can't set V on right shift
+            (dw_value & 0x80000000) ? ps_set(PS_C) : ps_reset(PS_C);
+            dw_value = dw_value << 1;
+        }
+    }
+    
+    (dw_value) ? ps_reset(PS_Z) : ps_set(PS_Z);
+    (dw_value < 0) ? ps_set(PS_N) : ps_reset(PS_N);
+    
+    reg[rnum] = (dw_value >> 16) & 0177777;
+    reg[rnum + 1] = (short) dw_value & 0177777;
+    
+}
+
 // two operarnd instructions
 
 void doMOV (short opcode) {
@@ -607,7 +638,7 @@ void dispatch (short opcode) {
                                         case MUL: doMUL(opcode); break;
                                         case DIV: doDIV(opcode); break;
                                         case ASH: doASH(opcode); break;
-                                            //case ASHC: doASHC(opcode); break;
+                                        case ASHC: doASHC(opcode); break;
                                             //case XOR: doXOR(opcode); break;
                                         default:
                                             switch (opcode & TWO_OP) { // Two Operand Instructions
