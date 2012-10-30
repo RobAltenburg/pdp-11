@@ -6,39 +6,47 @@
 //  Copyright (c) 2012 Robert Altenburg. All rights reserved.
 //
 
-#include <stdio.h>
+
 #include "core.h"
 
 //short * reg = (short *) (core + 0170000);
 
 void process_loop (void)
 {
-    
+
+    short opcode;
     
     while (interrupt_flag != SIM_HALT) {
         
         
-        short opcode = core_read_word(reg[7]);
-        printf("%#7o: %#7ho | ", reg[7], opcode);      
-        
-        PC = PC + 2; // increment the program counter
-        
-        // if PS T is set & opcode != RTT, trace trap from 14 (BPT)
-        
-        dispatch(opcode);
-            
-        for (int i = 0; i<6; i++) {
-            printf("%#7ho ",reg[i]);
+        switch (setjmp(jb)) {
+            case 0:
+                opcode = core_read_word(reg[7]);
+                printf("%#7o: %#7ho | ", reg[7], opcode);
+                
+                PC = PC + 2; // increment the program counter
+                
+                // if PS T is set & opcode != RTT, trace trap from 14 (BPT)
+                
+                dispatch(opcode);
+                
+                for (int i = 0; i<6; i++) {
+                    printf("%#7ho ",reg[i]);
+                }
+                
+                printf("| SP: %ho, ",SP);
+                if(ps_test(PS_N)) printf("N");
+                if(ps_test(PS_Z)) printf("Z");
+                if(ps_test(PS_V)) printf("V");
+                if(ps_test(PS_C)) printf("C");
+                printf("\n");
+                
+                break;
+                
+            default:
+                break;
         }
         
-        printf("| SP: %ho, ",SP);
-        if(ps_test(PS_N)) printf("N");
-        if(ps_test(PS_Z)) printf("Z");
-        if(ps_test(PS_V)) printf("V");
-        if(ps_test(PS_C)) printf("C");
-        printf("\n");
-
-    
         do {
             // check for traps and interrupts
             
@@ -182,11 +190,11 @@ short core_read_word(short offset)
         SP = SP - 2;
         core[SP] = PS;
         SP = SP - 2;
-        PC = 4;  // trap to location 4
-        
+        PC = 4;  
+        longjmp(jb, 4); // trap to location 4
     }
-        //read words from byte array
-        return  *(short *)(core + offset); 
+    //read words from byte array
+    return  *(short *)(core + offset);
 }
 
 
@@ -199,7 +207,8 @@ void core_write_word (short word, short offset)
         SP = SP - 2;
         core[SP] = PS;
         SP = SP - 2;
-        PC = 4;  // trap to location 4
+        PC = 4;
+        longjmp(jb, 4); // trap to location 4
     } // trap to location 4
     *(short *)(core + offset) = word; // write words to byte array
     
@@ -297,7 +306,7 @@ char byte_flip(char byte) {
 //    const short word_max = 077777;
 //    const short word_min = ~word_max;
 //    long testvar;
-//    
+//
 //    if (t2) {
 //        switch (operation) {
 //            case '+': testvar = t1 + t2; break;
@@ -306,13 +315,13 @@ char byte_flip(char byte) {
 //            case '/': testvar = t1 / t2; break;
 //            default: printf ("unknown operation\n");
 //        }
-//        
+//
 //        if ((testvar < word_min) || (testvar > word_max)) {
 //            *carry_flag = 1;
 //        } else {
 //            *carry_flag = 0;
 //        }
-//        
+//
 //        if ((testvar < (word_min >> 1)) || (testvar > (word_max >> 1))) {
 //            *overflow_flag = 1;
 //        } else {

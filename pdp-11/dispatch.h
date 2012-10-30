@@ -10,6 +10,7 @@
 #define pdp_11_dispatch_h
 
 #include <stdlib.h>
+#include <setjmp.h>
 
 void dispatch (short opcode);
 
@@ -26,8 +27,8 @@ void dispatch (short opcode);
 #define RTI     0000002 
 #define BPT     0000003 
 #define IOT     0000004 
-#define RESET   0000005 // todo: finish
-#define RTT     0000006 // todo: finish
+#define RESET   0000005
+#define RTT     0000006
 
 #define JMP     0000100
 #define RTS     0000200 
@@ -69,18 +70,18 @@ void dispatch (short opcode);
 // Two Operand Instructions
 #define MOV     0010000
 #define CMP     0020000 
-#define BIT     0030000 // todo
-#define BIC     0040000 // todo
-#define BIS     0050000 // todo
-#define ADD     0060000 // todo
-#define SUB     0160000 // todo
+#define BIT     0030000 
+#define BIC     0040000 
+#define BIS     0050000
+#define ADD     0060000
+#define SUB     0160000
 
 // One and a Half Operand Instructions
 #define MUL     0070000  
 #define DIV     0071000 
 #define ASH     0072000 
 #define ASHC    0073000 
-#define XOR     0074000 // todo
+#define XOR     0074000
 
 #define FADD    0075000 // todo
 #define FSUB    0075010 // todo
@@ -128,9 +129,9 @@ void dispatch (short opcode);
 
 #define MOVB    0110000 
 #define CMPB    0120000 
-#define BITB    0130000 // todo
-#define BICB    0140000 // todo
-
+#define BITB    0130000
+#define BICB    0140000 
+#define BISB    0150000 
 
 
 #endif

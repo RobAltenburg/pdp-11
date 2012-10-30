@@ -11,6 +11,8 @@
 #ifndef pdp_11_core_h
 #define pdp_11_core_h
 
+#include <stdio.h>
+#include <setjmp.h>
 #include "dispatch.h"
 
 
@@ -80,5 +82,9 @@ short word_flip(short word);
 char byte_flip(char byte);
 
 short word_operation (signed short t1, signed short t2, char operation, char *carry_flag, char *overflow_flag);
+
+
+// jump buffer used for traps
+jmp_buf jb;
 
 #endif

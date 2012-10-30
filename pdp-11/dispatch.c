@@ -587,6 +587,67 @@ void doADD (short opcode) {
         
 }
 
+void doSUB (short opcode) {
+    short source_w = read_word((opcode & 07700) >> 6);
+    short dest_w = read_word((opcode & 077));
+    short result =  dest_w - source_w;
+    ps_on_word(result);
+    ((source_w * result) < 0) ? ps_set(PS_V) : ps_reset(PS_V);
+    (result < dest_w) ? ps_set(PS_C) : ps_reset(PS_C);
+    
+}
+
+void doBIT (short opcode) {
+    short source_w = read_word((opcode & 07700) >> 6);
+    short dest_w = read_word((opcode & 077));
+    short result = source_w & dest_w;
+    ps_on_word(result);
+    ps_reset(PS_V);
+}
+
+void doBITB (short opcode) {
+    char source_b = read_word((opcode & 07700) >> 6);
+    char dest_b = read_word((opcode & 077));
+    char result = source_b & dest_b;
+    ps_on_byte(result);
+    ps_reset(PS_V);
+}
+
+void doBIC (short opcode) {
+    short source_w = read_word((opcode & 07700) >> 6);
+    short dest_w = read_word((opcode & 077));
+    short result = (!source_w) & dest_w;
+    write_word((opcode & 077), result);
+    ps_on_word(result);
+    ps_reset(PS_V);
+}
+
+void doBICB (short opcode) {
+    char source_b = read_word((opcode & 07700) >> 6);
+    char dest_b = read_word((opcode & 077));
+    char result = (!source_b) & dest_b;
+    write_byte((opcode & 077), result);
+    ps_on_byte(result);
+    ps_reset(PS_V);
+}
+
+void doBIS (short opcode) {
+    short source_w = read_word((opcode & 07700) >> 6);
+    short dest_w = read_word((opcode & 077));
+    short result = source_w | dest_w;
+    write_word((opcode & 077), result);
+    ps_on_word(result);
+    ps_reset(PS_V);
+}
+
+void doBISB (short opcode) {
+    char source_b = read_word((opcode & 07700) >> 6);
+    char dest_b = read_word((opcode & 077));
+    char result = source_b | dest_b;
+    write_byte((opcode & 077), result);
+    ps_on_byte(result);
+    ps_reset(PS_V);
+}
 
 void dispatch (short opcode) {
     
@@ -668,14 +729,14 @@ void dispatch (short opcode) {
                                                 case MOVB:  doMOVB(opcode); break;
                                                 case CMP:   doCMP(opcode); break;
                                                 case CMPB:  doCMPB(opcode); break;
-                                                 case ADD:   doADD(opcode); break;
-                                                    //case SUB:   doSUB(opcode); break;
-                                                    //case BIT:   doBIT(opcode); break;
-                                                    //case BITB:   doBITB(opcode); break;
-                                                    //case BIC:   doBIC(opcode); break;
-                                                    //case BICB:   doBICB(opcode); break;
-                                                    //case BIS:   doBIS(opcode); break;
-                                                    //case BISB:   doBISB(opcode); break;
+                                                case ADD:   doADD(opcode); break;
+                                                case SUB:   doSUB(opcode); break;
+                                                case BIT:   doBIT(opcode); break;
+                                                case BITB:  doBITB(opcode); break;
+                                                case BIC:   doBIC(opcode); break;
+                                                case BICB:  doBICB(opcode); break;
+                                                case BIS:   doBIS(opcode); break;
+                                                case BISB:  doBISB(opcode); break;
                                                 default:
                                                     
                                                     // Processor Status Word Instructions
