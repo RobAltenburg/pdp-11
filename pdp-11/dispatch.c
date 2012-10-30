@@ -512,6 +512,15 @@ void doASHC (short opcode) {
     
 }
 
+void doXOR (short opcode) {
+    char reg_number = (opcode & 0700) >> 6;
+    short value = reg[reg_number] ^ read_word((opcode & 077));
+    write_word((opcode & 077), value);
+    ps_reset(PS_V);
+    ps_on_word(value);
+}
+
+
 // two operarnd instructions
 
 void doMOV (short opcode) {
@@ -565,6 +574,19 @@ void doCMPB (short opcode) {
     
     // todo... test for PS_C
 }
+
+void doADD (short opcode) {
+    short source_w = read_word((opcode & 07700) >> 6);
+    short dest_w = read_word((opcode & 077));
+    short result =  source_w + dest_w;
+    
+    ps_on_word(result);
+    
+    ((source_w * result) < 0) ? ps_set(PS_V) : ps_reset(PS_V);
+    (result < dest_w) ? ps_set(PS_C) : ps_reset(PS_C);
+        
+}
+
 
 void dispatch (short opcode) {
     
@@ -639,14 +661,14 @@ void dispatch (short opcode) {
                                         case DIV: doDIV(opcode); break;
                                         case ASH: doASH(opcode); break;
                                         case ASHC: doASHC(opcode); break;
-                                            //case XOR: doXOR(opcode); break;
+                                        case XOR: doXOR(opcode); break;
                                         default:
                                             switch (opcode & TWO_OP) { // Two Operand Instructions
                                                 case MOV:   doMOV(opcode); break;
                                                 case MOVB:  doMOVB(opcode); break;
                                                 case CMP:   doCMP(opcode); break;
                                                 case CMPB:  doCMPB(opcode); break;
-                                                    //case ADD:   doADD(opcode); break;
+                                                 case ADD:   doADD(opcode); break;
                                                     //case SUB:   doSUB(opcode); break;
                                                     //case BIT:   doBIT(opcode); break;
                                                     //case BITB:   doBITB(opcode); break;

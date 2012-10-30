@@ -40,6 +40,8 @@ char priority_level;
 #define MAX_WORD 0177777
 #define MIN_WORD ~MAX_WORD
 
+#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+
 // memory access functions
 short read_word (char addr);
 char read_byte (char addr);
