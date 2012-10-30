@@ -176,13 +176,31 @@ void core_write_byte (char byte, short offset)
 
 short core_read_word(short offset)
 {
-    if (offset % 2 > 0 ) { printf("ERROR: attempt to read unaligned word (%o)\n", offset);}
-    return  *(short *)(core + offset); //read words from byte array
+    if (offset % 2 > 0 ) {
+        
+        core[SP] = PC;  // push PC and PS on the stack
+        SP = SP - 2;
+        core[SP] = PS;
+        SP = SP - 2;
+        PC = 4;  // trap to location 4
+        
+    }
+        //read words from byte array
+        return  *(short *)(core + offset); 
 }
+
+
+
 
 void core_write_word (short word, short offset)
 {
-    if (offset % 2 > 0 ) { printf("ERROR: attempt to write unaligned word.\n");}
+    if (offset % 2 > 0 ) {
+        core[SP] = PC;  // push PC and PS on the stack
+        SP = SP - 2;
+        core[SP] = PS;
+        SP = SP - 2;
+        PC = 4;  // trap to location 4
+    } // trap to location 4
     *(short *)(core + offset) = word; // write words to byte array
     
 }
